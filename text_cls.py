@@ -5,13 +5,13 @@ from transformers import AutoTokenizer
 
 
 # STEP 2. create inference instance (인퍼런스(추론)할 객체 만들기)
-# classifier = pipeline("sentiment-analysis", model="snunlp/KR-FinBert-SC")
+classifier = pipeline("sentiment-analysis", model="maidalun1020/bce-reranker-base_v1 ")
 #                             # task name             # model ; huggingface 홈페이지에서 조회가능
-classifier = pipeline("sentiment-analysis", model="stevhliu/my_awesome_model")
+# classifier = pipeline("sentiment-analysis", model="stevhliu/my_awesome_model")
 
 
 #STEP 3. prepare input data
-text = "I don't love you"
+text = "너무 기뻐!!"
 
 # STEP 4. inference 추론
 result = classifier(text)
