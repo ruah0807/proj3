@@ -6,19 +6,10 @@ import datetime
 import pandas as pd
 import re  # HTML 태그 제거를 위한 정규식 라이브러리
 
-import torch
-from transformers import pipeline
-from bs4 import BeautifulSoup
-
-
-
 app = FastAPI()
 
 # NewsAPI 키
 API_KEY = '1e347c3d847140fab193cd9bc5c81570'
-
-# AI Model
-question_answerer = pipeline("question-answering", model="stevhliu/my_awesome_qa_model")
 
 # 뉴스 항목을 나타내는 모델
 class NewsItem(BaseModel):
@@ -41,7 +32,7 @@ def clean_text(text):
 
 # 뉴스 검색 엔드포인트
 @app.get("/news/", response_model=List[NewsItem])
-def search_news(query: str, from_date: Optional[str] = None, to_date: Optional[str] = None, language: str = 'en', sort_by: str = 'publishedAt'):
+def search_news(query: str, from_date: Optional[str] = None, to_date: Optional[str] = None, language: str = 'ko', sort_by: str = 'publishedAt'):
     """
     NewsAPI를 사용하여 뉴스 기사를 검색하고 결과를 반환합니다.
     
