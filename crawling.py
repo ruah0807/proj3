@@ -2,15 +2,10 @@ import requests
 from bs4 import BeautifulSoup
 
 # IMDB의 영화 리뷰 페이지 URL
-data = requests.get('https://news.naver.com/section/101')
+data = requests.get('https://finance.naver.com/item/news_news.naver?code=000660&page=&clusterId=')
 soup = BeautifulSoup(data.content, 'html.parser')
 
-headline = soup.select('div.sa_text a strong.sa_text_strong')[0].text
+headline = soup.select('td.title a.tit')[0].text
 
 print(headline)
-# # 리뷰 텍스트를 찾기
-# review_divs = soup.find_all('div', class_='text show-more__control')
-# for review in review_divs:
-#     print(review.text)
-
 
