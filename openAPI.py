@@ -14,12 +14,13 @@ API_KEY = '1e347c3d847140fab193cd9bc5c81570'
 # 뉴스 항목을 나타내는 모델
 class NewsItem(BaseModel):
     source: str
-    author: Optional[str]
+    author: str
     title: str
-    description: Optional[str]
+    description: str
     url: str
     publishedAt: str
     urlToImage: str
+
 
 def clean_text(text):
     # HTML 태그 제거
@@ -30,19 +31,14 @@ def clean_text(text):
     text = re.sub(r'\s+', ' ', text).strip()
     return text
 
+
+
+
 # 뉴스 검색 엔드포인트
 @app.get("/news/", response_model=List[NewsItem])
-def search_news(query: str, from_date: Optional[str] = None, to_date: Optional[str] = None, language: str = 'ko', sort_by: str = 'publishedAt'):
-    """
-    NewsAPI를 사용하여 뉴스 기사를 검색하고 결과를 반환합니다.
-    
-    :param query: 검색어
-    :param from_date: 검색 시작 날짜 (옵션)
-    :param to_date: 검색 종료 날짜 (옵션)
-    :param language: 검색 언어 (기본값: 'en')
-    :param sort_by: 정렬 기준 (기본값: 'publishedAt')
-    :return: 뉴스 기사 목록
-    """
+def search_news(query: str, from_date: Optional[str] = None, to_date: Optional[str] = None,  language: str = 'ko', sort_by: str = 'publishedAt'):
+
+#    NewsAPI를 사용하여 뉴스 기사를 검색하고 결과를 반환합니다.
     url = 'https://newsapi.org/v2/everything'
     params = {
         'q': query,
@@ -50,7 +46,8 @@ def search_news(query: str, from_date: Optional[str] = None, to_date: Optional[s
         'to': to_date,
         'language': language,
         'sortBy': sort_by,
-        'apiKey': API_KEY
+        'apiKey': API_KEY,
+       
     }
     
     # API 요청
