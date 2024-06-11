@@ -14,12 +14,12 @@ API_KEY = '1e347c3d847140fab193cd9bc5c81570'
 # 뉴스 항목을 나타내는 모델
 class NewsItem(BaseModel):
     source: str
-    author: str
+    author: Optional[str] = None
     title: str
     description: str
     url: str
     publishedAt: str
-    urlToImage: str
+    urlToImage: Optional[str] = None
 
 
 def clean_text(text):
@@ -36,7 +36,7 @@ def clean_text(text):
 
 # 뉴스 검색 엔드포인트
 @app.get("/news/", response_model=List[NewsItem])
-def search_news(query: str, from_date: Optional[str] = None, to_date: Optional[str] = None,  language: str = 'ko', sort_by: str = 'publishedAt'):
+def search_news(query: str, from_date: Optional[str] = None, to_date: Optional[str] = None,  language: str = 'en', sort_by: str = 'publishedAt'):
 
 #    NewsAPI를 사용하여 뉴스 기사를 검색하고 결과를 반환합니다.
     url = 'https://newsapi.org/v2/everything'
@@ -70,12 +70,12 @@ def search_news(query: str, from_date: Optional[str] = None, to_date: Optional[s
         
         news_items.append(NewsItem(
             source=article['source']['name'],
-            author=article.get('author'),
+            author=article.get('author',None),
             title=article['title'],
             description=clean_description,
             url=article['url'],
             publishedAt=article['publishedAt'],
-            urlToImage=article['urlToImage']
+            urlToImage=article.get('urlToImage',None)
         ))
     
     return news_items
