@@ -19,7 +19,7 @@ class NewsItem(BaseModel):
     description: Optional[str]
     url: str
     publishedAt: str
-    content: Optional[str]
+    urlToImage: str
 
 def clean_text(text):
     # HTML 태그 제거
@@ -69,7 +69,6 @@ def search_news(query: str, from_date: Optional[str] = None, to_date: Optional[s
     for article in articles:
         # HTML 태그 제거
         clean_description = clean_text(article.get('description', ''))
-        clean_content = clean_text(article.get('content', ''))
         
         
         news_items.append(NewsItem(
@@ -79,7 +78,7 @@ def search_news(query: str, from_date: Optional[str] = None, to_date: Optional[s
             description=clean_description,
             url=article['url'],
             publishedAt=article['publishedAt'],
-            content=clean_content
+            urlToImage=article['urlToImage']
         ))
     
     return news_items
