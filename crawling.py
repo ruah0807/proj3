@@ -1,50 +1,12 @@
 import requests
 from bs4 import BeautifulSoup
 
-
-# def inspect_article_structure(url):
-#     try:
-#         response = requests.get(url)
-#         if response.status_code != 200:
-#             print(f"Failed to retrieve article from {url}: {response.status_code}")
-#             return
-#         soup = BeautifulSoup(response.content, 'html.parser')
-
-#         # HTML 전체 구조를 확인하기 위해 전체 출력
-#         with open('article_structure.html', 'w', encoding='utf-8') as file:
-#             file.write(soup.prettify())
-        
-#         print("HTML 구조를 article_structure.html 파일로 저장했습니다.")
-
-#     except Exception as e:
-#         print(f"An error occurred while retrieving article: {e}")
-
-# # 예제 URL로 HTML 구조 확인
-# test_url = "https://n.news.naver.com/mnews/article/011/0004352036"
-# inspect_article_structure(test_url)
-
-def get_redirected_url(url):
-    try:
-        response = requests.get(url, allow_redirects=True)
-        
-        if response.status_code == 200:
-            return response.url
-        else:
-            print(f"Failed to retrieve redirected URL from {url}: {response.status_code}")
-            return None
-    except Exception as e:
-        print(f"An error occurred while retrieving redirected URL: {e}")
-        return None
-
 def get_article_content(url):
     try:
-        redirected_url = get_redirected_url(url)
-        if not redirected_url:
-            return None
-        print(f"Fetching content from redirected URL: {redirected_url}")  # 디버깅을 위해 URL 출력
-        data = requests.get(redirected_url)
+        print(f"Fetching content from URL: {url}")  # 디버깅을 위해 URL 출력
+        data = requests.get(url)
         if data.status_code != 200:
-            print(f"Failed to retrieve article from {redirected_url}: {data.status_code}")
+            print(f"Failed to retrieve article from {url}: {data.status_code}")
             return None
         soup = BeautifulSoup(data.content, 'html.parser')
 
@@ -54,17 +16,33 @@ def get_article_content(url):
             article = article_div.find('article')
             if article:
                 return article.text.strip()
-        print(f"No article content found at {redirected_url}")
+        print(f"No article content found at {url}")
         return None
     except Exception as e:
         print(f"An error occurred while retrieving article: {e}")
         return None
 
+def convert_to_naver_news_url(finance_url):
+    try:
+        # URL 예시: https://finance.naver.com/item/news_read.naver?article_id=0002879618&office_id=029&code=196170&page=&sm=
+        parts = finance_url.split('?')[1].split('&')
+        params = {part.split('=')[0]: part.split('=')[1] for part in parts}
+        article_id = params.get('article_id')
+        office_id = params.get('office_id')
+        if article_id and office_id:
+            return f"https://n.news.naver.com/mnews/article/{office_id}/{article_id}"
+        else:
+            print(f"Invalid article ID or office ID in URL: {finance_url}")
+            return None
+    except Exception as e:
+        print(f"An error occurred while converting URL: {e}")
+        return None
 
 def crawling(code):
     try:
         # 증권 뉴스 URL
         url = f'https://finance.naver.com/item/news_news.naver?code={code}&page=&clusterId='
+        print(f"Fetching news list from URL: {url}")  # 디버깅을 위해 URL 출력
         
         data = requests.get(url)
         
@@ -80,25 +58,29 @@ def crawling(code):
         titles = soup.find_all('a', class_='tit')
         authors = soup.find_all('td', class_='info')
         dates = soup.find_all('td', class_='date')
+
+        print(f"Found {len(titles)} titles, {len(authors)} authors, and {len(dates)} dates.")  # 디버깅 메시지
         
         news_data = []
         for i in range(min(len(titles), len(authors), len(dates))):
             title = titles[i].text.strip()
             author = authors[i].text.strip()
             date = dates[i].text.strip()
-            article_url = titles[i]['href']
-            # 절대 URL 확인 및 변환
-            if article_url.startswith('/'):
-                article_url = 'https://finance.naver.com' + article_url
-            elif article_url.startswith('http'):
-                article_url = article_url
-            else:
-                article_url = 'https://n.news.naver.com' + article_url
-            print(article_url)  # 디버깅을 위해 URL 출력
-            content = get_article_content(article_url)
-            if content:
-                news_data.append((title, author, date, content))
-        
+            article_url = titles[i].get('href')  # 올바른 href 속성을 추출
+            print(f"Raw article URL: {article_url}")  # 디버깅을 위해 원본 URL 출력
+            if article_url:
+                # 절대 URL 확인 및 변환
+                if article_url.startswith('/item'):
+                    article_url = 'https://finance.naver.com' + article_url
+                converted_url = convert_to_naver_news_url(article_url)
+                if converted_url:
+                    print(f"Converted article URL: {converted_url}")  # 디버깅을 위해 URL 출력
+                    content = get_article_content(converted_url)
+                    if content:
+                        news_data.append((title, author, date, content))
+                    else:
+                        print(f"No content found for URL: {converted_url}")
+                    
         return news_data
     except Exception as e:
         print(f"An error occurred: {e}")
@@ -113,4 +95,4 @@ with open('a.txt', 'a') as f:
         news_list = crawling(code)
         if news_list:
             for news in news_list:
-                f.write(f"{news[0]} | {news[1]} | {news[2]} \n")
+                f.write(f"{news[0]} | {news[1]} | {news[2]} | {news[3]}\n")
