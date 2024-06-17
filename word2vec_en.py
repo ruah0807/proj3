@@ -58,3 +58,4 @@ loaded_model = KeyedVectors.load_word2vec_format('eng_w2v') # 모델 로드
 
 model_result = loaded_model.most_similar('man')
 print(model_result)
+
