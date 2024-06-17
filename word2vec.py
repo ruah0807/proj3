@@ -18,3 +18,4 @@ print(vector)
 #유사한 단어 찾기
 similar_words = model.wv.most_similar('Word2Vec')
 print(similar_words)
+
