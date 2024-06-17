@@ -52,7 +52,6 @@ model = Word2Vec(sentences=result, vector_size=100, window=5, min_count=5, worke
 # sg = 0은 CBOW, 1은 Skip-gram
 
 
-
 model.wv.save_word2vec_format('eng_w2v')    # 모델 저장
 loaded_model = KeyedVectors.load_word2vec_format('eng_w2v') # 모델 로드
 

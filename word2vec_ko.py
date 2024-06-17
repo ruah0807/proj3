@@ -41,10 +41,27 @@ for sentence in tqdm(train_data['document']):
     tokenized_data.append(stopwords_removed_sentence)
     
 #리뷰 길이 분포 확인
-print('리뷰의 최대길이 : ', max(len(review) for review in tokenized_data))
-print('리뷰의 평균 길이 : ', sum(map(len, tokenized_data))/len(tokenized_data))
-plt.hist([len(review) for review in tokenized_data], bins=50)
-plt.xlabel('length of samples')
-plt.ylabel('number of samples')
-plt.show()
+# print('리뷰의 최대길이 : ', max(len(review) for review in tokenized_data))
+# print('리뷰의 평균 길이 : ', sum(map(len, tokenized_data))/len(tokenized_data))
+# plt.hist([len(review) for review in tokenized_data], bins=50)
+# plt.xlabel('length of samples')
+# plt.ylabel('number of samples')
+# plt.show()
+
+
+
+
+### Word2vec 으로 토큰화 된 영화리뷰데이터 학습 ###
+
+from gensim.models import Word2Vec
+
+model = Word2Vec(sentences = tokenized_data, vector_size = 100, window=5, min_count = 5, workers=4, sg=0)
+
+# 완선된 임베딩 매트릭스 크기 확인
+metircs_size = model.wv.vectors.shape
+
+print(metircs_size)
+print(model.wv.most_similar('여자'))
+print(model.wv.most_similar('최고'))
+
 
